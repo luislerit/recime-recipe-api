@@ -1,4 +1,4 @@
-package com.recime.recipe_api;
+package com.recime.recipeapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

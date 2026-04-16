@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'com.recime.recipe-api' is invalid and this project uses 'com.recime.recipe_api' instead.
+* The original package name 'com.recime.recipe-api' is invalid and this project uses 'com.recime.recipeapi' instead.
 
 # Getting Started
 

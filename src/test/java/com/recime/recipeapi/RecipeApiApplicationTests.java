@@ -1,4 +1,4 @@
-package com.recime.recipe_api;
+package com.recime.recipeapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
