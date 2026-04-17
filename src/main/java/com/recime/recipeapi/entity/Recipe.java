@@ -47,14 +47,14 @@ public class Recipe {
     private String description;
 
     @Builder.Default
-    private Integer serving = 0;
+    private Integer servings = 0;
 
     @Builder.Default
     private Boolean isVegetarian = false;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Ingredient> ingredients = new ArrayList<>();
+    private Set<Ingredient> ingredients = new HashSet<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
