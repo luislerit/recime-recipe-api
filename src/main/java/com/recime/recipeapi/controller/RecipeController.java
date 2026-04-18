@@ -3,6 +3,7 @@ package com.recime.recipeapi.controller;
 import com.recime.recipeapi.dto.request.RecipeRequest;
 import com.recime.recipeapi.dto.response.RecipeResponse;
 import com.recime.recipeapi.service.RecipeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,7 @@ public class RecipeController {
 
     @PostMapping
     public ResponseEntity<RecipeResponse> create(@RequestHeader("X-User-Id") UUID userId,
-                                                 @RequestBody RecipeRequest request) {
+                                                 @RequestBody @Valid RecipeRequest request) {
         RecipeResponse recipeResponse = recipeService.create(request, userId);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -68,7 +69,7 @@ public class RecipeController {
     @PutMapping("/{id}")
     public ResponseEntity<RecipeResponse> update(@PathVariable("id") Long recipeId,
                                                  @RequestHeader("X-User-Id") UUID userId,
-                                                 @RequestBody RecipeRequest request) {
+                                                 @RequestBody @Valid RecipeRequest request) {
         return ResponseEntity.ok(recipeService.update(request, recipeId, userId));
     }
 

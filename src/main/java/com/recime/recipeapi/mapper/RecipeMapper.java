@@ -26,7 +26,7 @@ public class RecipeMapper {
                 .userId(userId)
                 .title(request.getTitle())
                 .description(request.getDescription())
-                .servings(request.getServings() != null ? request.getServings() : 0)
+                .servings(resolveServings(request.getServings(), request.getIngredients()))
                 .isVegetarian(request.getIsVegetarian() != null ? request.getIsVegetarian() : false)
                 .build();
 
@@ -34,6 +34,11 @@ public class RecipeMapper {
         recipe.setInstructions(mapInstructions(request.getInstructions(), recipe));
 
         return recipe;
+    }
+
+    private int resolveServings(Integer servings, Set<IngredientRequest> ingredients) {
+        if (servings != null) return servings;
+        return (ingredients != null && !ingredients.isEmpty()) ? 1 : 0;
     }
 
     public void updateEntity(Recipe recipe, RecipeRequest recipeRequest) {
@@ -65,7 +70,7 @@ public class RecipeMapper {
                             .stepOrder(instruction.getStepOrder())
                             .description(instruction.getDescription())
                             .build())
-                        .collect(Collectors.toSet());
+                        .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
 
         return RecipeResponse.builder()
                 .id(recipe.getId())
