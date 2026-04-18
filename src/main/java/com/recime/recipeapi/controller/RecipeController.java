@@ -58,11 +58,9 @@ public class RecipeController {
                                                        @RequestParam(required = false) Set<String> include,
                                                        @RequestParam(required = false) Set<String> exclude,
                                                        @RequestParam(required = false) String instruction,
-                                                       @ParameterObject @PageableDefault(
-                                                               size = 10,
-                                                               sort = "createdAt",
-                                                               direction = Sort.Direction.DESC)
-                                                       Pageable pageable) {
+                                                       @ParameterObject @PageableDefault(size = 20, sort = "createdAt",
+                                                               direction = Sort.Direction.DESC) Pageable pageable) {
+
         return ResponseEntity.ok(
                 recipeService.search(userId, isVegetarian, servings, include, exclude, instruction, pageable));
     }
