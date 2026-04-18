@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,26 +36,19 @@ public class RecipeController {
     @PostMapping
     public ResponseEntity<RecipeResponse> create(@RequestHeader("X-User-Id") UUID userId,
                                                  @RequestBody RecipeRequest request) {
-        return null;
-    }
+        RecipeResponse recipeResponse = recipeService.create(request, userId);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(recipeResponse.getId())
+                .toUri();
 
-    @PutMapping("/{id}")
-    public ResponseEntity<RecipeResponse> update(@PathVariable("id") Long recipeId,
-                                                 @RequestHeader("X-User-Id") UUID userId,
-                                                 @RequestBody RecipeRequest request) {
-        return null;
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long recipeId,
-                                       @RequestHeader("X-User-Id") UUID userId) {
-        return null;
+        return ResponseEntity.created(location).body(recipeResponse);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<RecipeResponse> findById(@PathVariable("id") Long recipeId,
                                                    @RequestHeader("X-User-Id") UUID userId) {
-        return null;
+        return ResponseEntity.ok(recipeService.findById(recipeId, userId));
     }
 
     @GetMapping
@@ -67,7 +62,23 @@ public class RecipeController {
                                                                size = 10,
                                                                sort = "createdAt",
                                                                direction = Sort.Direction.DESC)
-                                                           Pageable pageable) {
-        return null;
+                                                       Pageable pageable) {
+        return ResponseEntity.ok(
+                recipeService.search(userId, isVegetarian, servings, include, exclude, instruction, pageable));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<RecipeResponse> update(@PathVariable("id") Long recipeId,
+                                                 @RequestHeader("X-User-Id") UUID userId,
+                                                 @RequestBody RecipeRequest request) {
+        return ResponseEntity.ok(recipeService.update(request, recipeId, userId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") Long recipeId,
+                                       @RequestHeader("X-User-Id") UUID userId) {
+        recipeService.delete(recipeId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
