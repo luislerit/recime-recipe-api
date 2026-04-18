@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class RecipeResponse {
 
-    private Integer id;
+    private Long id;
     private UUID userId;
     private String title;
     private String description;
@@ -22,4 +23,6 @@ public class RecipeResponse {
     private Boolean isVegetarian;
     private Set<IngredientResponse> ingredients;
     private Set<InstructionResponse> instructions;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
