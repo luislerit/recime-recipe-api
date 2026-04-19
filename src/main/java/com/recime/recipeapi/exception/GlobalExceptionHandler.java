@@ -1,8 +1,8 @@
 package com.recime.recipeapi.exception;
 
-import com.recime.recipeapi.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -11,78 +11,67 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
     @ExceptionHandler(RecipeNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleRecipeNotFound(RecipeNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                ErrorResponse.builder()
-                        .status(HttpStatus.NOT_FOUND.value())
-                        .error("Not Found")
-                        .message(ex.getMessage())
-                        .build()
-        );
+    public ResponseEntity<ProblemDetail> handleRecipeNotFound(RecipeNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Not Found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult().getFieldErrors().stream()
+    public ResponseEntity<ProblemDetail> handleValidation(MethodArgumentNotValidException ex) {
+        List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(fe -> Map.of(
+                        "field", fe.getField(),
+                        "message", fe.getDefaultMessage() == null ? "" : fe.getDefaultMessage()))
+                .collect(Collectors.toList());
+        String detail = ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .collect(Collectors.joining(", "));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ErrorResponse.builder()
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .error("Bad Request")
-                        .message(message)
-                        .build()
-        );
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
+        problem.setTitle("Validation Failed");
+        problem.setProperty("errors", errors);
+        return ResponseEntity.badRequest().body(problem);
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<ErrorResponse> handleMissingHeader(MissingRequestHeaderException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ErrorResponse.builder()
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .error("Bad Request")
-                        .message("Required header '" + ex.getHeaderName() + "' is missing")
-                        .build()
-        );
+    public ResponseEntity<ProblemDetail> handleMissingHeader(MissingRequestHeaderException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Required header '" + ex.getHeaderName() + "' is missing");
+        problem.setTitle("Bad Request");
+        return ResponseEntity.badRequest().body(problem);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponse> handleMissingParam(MissingServletRequestParameterException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ErrorResponse.builder()
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .error("Bad Request")
-                        .message("Required parameter '" + ex.getParameterName() + "' is missing")
-                        .build()
-        );
+    public ResponseEntity<ProblemDetail> handleMissingParam(MissingServletRequestParameterException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Required parameter '" + ex.getParameterName() + "' is missing");
+        problem.setTitle("Bad Request");
+        return ResponseEntity.badRequest().body(problem);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ErrorResponse.builder()
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .error("Bad Request")
-                        .message("Invalid value for parameter '" + ex.getName() + "': " + ex.getValue())
-                        .build()
-        );
+    public ResponseEntity<ProblemDetail> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+                "Invalid value for parameter '" + ex.getName() + "': " + ex.getValue());
+        problem.setTitle("Bad Request");
+        return ResponseEntity.badRequest().body(problem);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+    public ResponseEntity<ProblemDetail> handleGeneric(Exception ex) {
         log.error("Unexpected error", ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                ErrorResponse.builder()
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                        .error("Internal Server Error")
-                        .message("An unexpected error occurred")
-                        .build()
-        );
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred");
+        problem.setTitle("Internal Server Error");
+        return ResponseEntity.internalServerError().body(problem);
     }
 }

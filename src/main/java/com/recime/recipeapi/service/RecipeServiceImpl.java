@@ -80,7 +80,7 @@ public class RecipeServiceImpl implements RecipeService {
     public void delete(Long recipeId, UUID userId) {
         Recipe recipe = recipeRepository.findByIdAndUserId(recipeId, userId)
                 .orElseThrow(() -> {
-                    log.warn("Recipe not found for update: recipeId={} userId={}", recipeId, userId);
+                    log.warn("Recipe not found for delete: recipeId={} userId={}", recipeId, userId);
                     return new RecipeNotFoundException("Recipe not found");
                 });
         recipeRepository.delete(recipe);
