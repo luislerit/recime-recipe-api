@@ -1,6 +1,7 @@
 package com.recime.recipeapi.specification;
 
 import com.recime.recipeapi.entity.Ingredient;
+import com.recime.recipeapi.entity.Instruction;
 import com.recime.recipeapi.entity.Recipe;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -71,8 +72,14 @@ public class RecipeSpecification {
         if (keyword == null || keyword.isBlank()) return null;
 
         return (root, query, cb) -> {
-            var instructionJoin = root.join("instructions");
-            return cb.like(cb.lower(instructionJoin.get("description")), "%" + keyword.toLowerCase() + "%");
+            Subquery<Long> sub = query.subquery(Long.class);
+            Root<Instruction> instrRoot = sub.from(Instruction.class);
+            sub.select(instrRoot.get("id"))
+                    .where(
+                            cb.equal(instrRoot.get("recipe"), root),
+                            cb.like(cb.lower(instrRoot.get("description")), "%" + keyword.toLowerCase() + "%")
+                    );
+            return cb.exists(sub);
         };
     }
 }

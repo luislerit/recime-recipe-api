@@ -44,7 +44,7 @@ public class RecipeMapper {
     public void updateEntity(Recipe recipe, RecipeRequest recipeRequest) {
         recipe.setTitle(recipeRequest.getTitle());
         recipe.setDescription(recipeRequest.getDescription());
-        recipe.setServings(recipeRequest.getServings() != null ? recipeRequest.getServings() : 0);
+        recipe.setServings(resolveServings(recipeRequest.getServings(), recipeRequest.getIngredients()));
         recipe.setIsVegetarian(recipeRequest.getIsVegetarian() != null ? recipeRequest.getIsVegetarian() : false);
 
         recipe.getIngredients().clear();

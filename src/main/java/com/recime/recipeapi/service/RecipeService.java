@@ -11,8 +11,8 @@ import java.util.UUID;
 public interface RecipeService {
 
     RecipeResponse create(RecipeRequest recipeRequest, UUID userId);
-    RecipeResponse update(RecipeRequest recipeRequest, Long recipeId, UUID usedId);
-    void delete(Long recipeId, UUID usedId);
+    RecipeResponse update(RecipeRequest recipeRequest, Long recipeId, UUID userId);
+    void delete(Long recipeId, UUID userId);
     RecipeResponse findById(Long recipeId, UUID userId);
 
     Page<RecipeResponse> search(
