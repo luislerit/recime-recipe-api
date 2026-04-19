@@ -2,6 +2,7 @@ package com.recime.recipeapi.exception;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -65,6 +66,18 @@ class GlobalExceptionHandlerTest {
         ProblemDetail body = response.getBody();
         assertThat(body).isNotNull();
         assertThat(body.getDetail()).contains("X-User-Id");
+    }
+
+    @Test
+    void handleDataIntegrity_returns409Conflict() {
+        ResponseEntity<ProblemDetail> response = handler.handleDataIntegrity(
+                new DataIntegrityViolationException("duplicate key"));
+
+        assertThat(response.getStatusCode().value()).isEqualTo(409);
+        ProblemDetail body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getTitle()).isEqualTo("Conflict");
+        assertThat(body.getDetail()).isEqualTo("Request conflicts with existing data");
     }
 
     @Test
