@@ -186,7 +186,7 @@ mvn test
 - **Specification** — null/empty input returns a no-op spec
 - **Exception handler** — each exception maps to the correct `ProblemDetail` shape
 
-38 tests. No integration tests against a real DB. Testcontainers is the right call and is listed under [What I Would Do Next](#what-i-would-do-next).
+40 tests. No integration tests against a real DB. Testcontainers is the right call and is listed under [What I Would Do Next](#what-i-would-do-next).
 
 ---
 
@@ -236,7 +236,7 @@ CREATE USER recime_user WITH PASSWORD 'yourpassword';
 GRANT ALL PRIVILEGES ON DATABASE recimedb TO recime_user;
 ```
 
-1. Set the environment variables:
+2. Set the environment variables:
 
 ```bash
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/recimedb
@@ -244,7 +244,7 @@ export SPRING_DATASOURCE_USERNAME=recime_user
 export SPRING_DATASOURCE_PASSWORD=yourpassword
 ```
 
-1. Run with the `dev` profile:
+3. Run with the `dev` profile:
 
 ```bash
 SPRING_PROFILES_ACTIVE=dev mvn spring-boot:run
